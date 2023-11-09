@@ -4,3 +4,5 @@ static-site/
 .terraform.lock.hcl
 terraform.tfstate
 terraform.tfstate.backup
+changes.txt
+wildrydes-site/
