@@ -21,7 +21,7 @@ resource "aws_iam_role" "lambdaRole" {
           "Sid" : "IAMPolicy01",
           "Effect" : "Allow",
           "Action" : "dynamodb:PutItem",
-          "Resource" : "arn:aws:dynamodb:ap-southeast-2:355385224066:table/Rides"
+          "Resource" : "${aws_dynamodb_table.rides_table.arn}"
         }
       ]
     })
