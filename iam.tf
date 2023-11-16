@@ -1,36 +1,38 @@
-# resource "aws_iam_role" "lambdaRole" {
-#   name = "lambdaRole"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = "sts:AssumeRole"
-#         Effect = "Allow"
-#         Sid    = ""
-#         Principal = {
-#           Service = "ec2.amazonaws.com"
-#         }
-#       },
-#     ]
-#   })
+data "aws_iam_policy_document" "lambda_assume_role_policy" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    principals {
+      type        = "Service"
+      identifiers = ["lambda.amazonaws.com"]
+    }
+  }
+}
 
-#   inline_policy {
-#     name = "DynamoDBWriteAccess"
+resource "aws_iam_role" "lambdaRole" {
+  name = "WildRydesLambda"
+  assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 
-#     policy = jsonencode({
-#       "Version" : "2012-10-17",
-#       "Statement" : [
-#         {
-#           "Sid" : "VisualEditor0",
-#           "Effect" : "Allow",
-#           "Action" : "dynamodb:PutItem",
-#           "Resource" : "arn:aws:dynamodb:ap-southeast-2:355385224066:table/Rides"
-#         }
-#       ]
-#     })
-#   }
+  inline_policy {
+    name = "DynamoDBWriteAccess"
+    policy = jsonencode({
+      "Version" : "2012-10-17",
+      "Statement" : [
+        {
+          "Sid" : "IAMPolicy01",
+          "Effect" : "Allow",
+          "Action" : "dynamodb:PutItem",
+          "Resource" : "arn:aws:dynamodb:ap-southeast-2:355385224066:table/Rides"
+        }
+      ]
+    })
+    }
 
-#   tags = {
-#     tag-key = "tag-value"
-#   }
-# }
+  tags = {
+    project = var.tag
+  }
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_role_attachment" {
+  role       = aws_iam_role.lambdaRole.name
+  policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
