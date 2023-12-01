@@ -1,65 +1,65 @@
-# # Create SES resource 
-# resource "aws_ses_email_identity" "ses_email" {
-#   email = var.ses_email
-# }
+# Create SES resource 
+data "aws_ses_email_identity" "ses_email" {
+  email = var.ses_email
+}
 
-# resource "aws_cognito_user_pool" "user_login_pool" {
-#   name              = var.cognito_pool
-#   mfa_configuration = "OFF"
-#   username_attributes =  var.cognito_verified_attributes
-#   auto_verified_attributes = var.cognito_verified_attributes
-#   deletion_protection = "INACTIVE"
-  
-#   username_configuration {
-#     case_sensitive = false
-#   }
+resource "aws_cognito_user_pool" "user_login_pool" {
+  name                     = var.cognito_pool
+  mfa_configuration        = "OFF"
+  username_attributes      = var.cognito_verified_attributes
+  auto_verified_attributes = var.cognito_verified_attributes
+  deletion_protection      = "INACTIVE"
 
-#   password_policy {
-#     minimum_length                   = 10
-#     require_lowercase                = true
-#     require_numbers                  = true
-#     require_symbols                  = true
-#     require_uppercase                = true
-#     temporary_password_validity_days = 2
-#   }
+  username_configuration {
+    case_sensitive = false
+  }
 
-#   account_recovery_setting {
-#     recovery_mechanism {
-#       name     = "verified_email"
-#       priority = 1
-#     }
-#   }
+  password_policy {
+    minimum_length                   = 10
+    require_lowercase                = true
+    require_numbers                  = true
+    require_symbols                  = true
+    require_uppercase                = true
+    temporary_password_validity_days = 2
+  }
 
-#   user_attribute_update_settings {
-#     attributes_require_verification_before_update = var.cognito_verified_attributes
-#   }
+  account_recovery_setting {
+    recovery_mechanism {
+      name     = "verified_email"
+      priority = 1
+    }
+  }
 
-#   email_configuration {
-#     email_sending_account = "DEVELOPER"
-#     from_email_address    = "${var.ses_name} <${var.ses_email}>"
-#     source_arn            = aws_ses_email_identity.ses_email.arn
-#   }
+  user_attribute_update_settings {
+    attributes_require_verification_before_update = var.cognito_verified_attributes
+  }
 
-#   schema {
-#       name = "email"
-#       attribute_data_type = "String"
-#       mutable = true
-#       required = true
-#       developer_only_attribute = false
-#       string_attribute_constraints {
-#         min_length = 1
-#         max_length = 2048
-#       }
-#   }
+  email_configuration {
+    email_sending_account = "DEVELOPER"
+    from_email_address    = "${var.ses_name} <${data.aws_ses_email_identity.ses_email.email}>"
+    source_arn            = data.aws_ses_email_identity.ses_email.arn
+  }
 
-#   tags = {
-#     project = var.tag
-#   }
-# }
+  schema {
+    name                     = "email"
+    attribute_data_type      = "String"
+    mutable                  = true
+    required                 = true
+    developer_only_attribute = false
+    string_attribute_constraints {
+      min_length = 1
+      max_length = 2048
+    }
+  }
 
-# resource "aws_cognito_user_pool_client" "user_pool_client" {
-#   name                          = var.cognito_pool_client
-#   user_pool_id                  = aws_cognito_user_pool.user_login_pool.id
-#   prevent_user_existence_errors = "ENABLED"
-#   explicit_auth_flows           = ["ALLOW_CUSTOM_AUTH", "ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
-# }
+  tags = {
+    project = var.tag
+  }
+}
+
+resource "aws_cognito_user_pool_client" "user_pool_client" {
+  name                          = var.cognito_pool_client
+  user_pool_id                  = aws_cognito_user_pool.user_login_pool.id
+  prevent_user_existence_errors = "ENABLED"
+  explicit_auth_flows           = ["ALLOW_CUSTOM_AUTH", "ALLOW_USER_SRP_AUTH", "ALLOW_REFRESH_TOKEN_AUTH"]
+}

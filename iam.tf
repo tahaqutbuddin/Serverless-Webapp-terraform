@@ -9,7 +9,7 @@ data "aws_iam_policy_document" "lambda_assume_role_policy" {
 }
 
 resource "aws_iam_role" "lambdaRole" {
-  name = "WildRydesLambda"
+  name               = "WildRydesLambda"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role_policy.json
 
   inline_policy {
@@ -25,7 +25,7 @@ resource "aws_iam_role" "lambdaRole" {
         }
       ]
     })
-    }
+  }
 
   tags = {
     project = var.tag
