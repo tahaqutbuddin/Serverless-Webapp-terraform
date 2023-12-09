@@ -14,13 +14,14 @@ resource "aws_lambda_function" "wildrydes_lambda" {
   runtime       = "nodejs16.x"
 }
 
-# resource "aws_lambda_permission" "lambda_permission" {
-#   statement_id  = "AllowMyDemoAPIInvoke"
-#   action        = "lambda:InvokeFunction"
-#   function_name = "MyDemoFunction"
-#   principal     = "apigateway.amazonaws.com"
+resource "aws_lambda_permission" "lambda_permission" {
+  statement_id  = "AllowExecutionFromAPIGateway"
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.wildrydes_lambda.function_name
+  principal     = "apigateway.amazonaws.com"
 
-#   # The /* part allows invocation from any stage, method and resource path
-#   # within API Gateway.
-#   source_arn = "${aws_api_gateway_rest_api.wildrydes_api.execution_arn}/*"
-# }
+  # The /* part allows invocation from any stage, method and resource path
+  # within API Gateway.
+  source_arn = "arn:aws:execute-api:${var.region}:${var.accountId}:${aws_api_gateway_rest_api.wildrydes_api.id}/*/${aws_api_gateway_method.requestUnicorn.http_method}${aws_api_gateway_resource.root.path}"
+  # source_arn = "${aws_api_gateway_rest_api.wildrydes_api.execution_arn}/*"
+}
