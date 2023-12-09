@@ -8,6 +8,11 @@ variable "region" {
   }
 }
 
+variable "accountId" {
+  type     = number
+  nullable = false
+}
+
 variable "tag" {
   type        = string
   default     = "terraform"
